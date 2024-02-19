@@ -9,4 +9,4 @@ The goal of the project is to simulate and analyze interactions between self-int
 # References
 This project was inpsired by the paper listed below. The github code of the original project can be found at [mongooma/polarizationTipping](https://github.com/mongooma/polarizationTipping).
 
-```Macy, M. W., Ma, M., Tabin, D. R., Gao, J., & Szymanski, B. K. (2021). Polarization and tipping points. Proceedings of the National Academy of Sciences, 118(50), e2102144118.```
+_Macy, M. W., Ma, M., Tabin, D. R., Gao, J., & Szymanski, B. K. (2021). Polarization and tipping points. Proceedings of the National Academy of Sciences, 118(50), e2102144118._
