@@ -1,0 +1,20 @@
+normal distributions:
+
+fraction 0.1 tolerance 0.4 everyone dies
+fraction 0.1 tolerance 0.5 explodes
+fraction 0.1 tolerance 0.5+ explodes
+
+
+fraction 0.2 tolerance 0.4+ explodes
+
+
+fraction 0.3 tolerance 0.3
+
+
+fraction 0.4 tolerance 
+
+
+normal distributions: 
+within team percentage: 0.9
+fraction 0.1 tolerance 0.4  -- survived a little bit 15 rounds
+

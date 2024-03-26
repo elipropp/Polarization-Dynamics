@@ -52,6 +52,9 @@ class Team:
     def get_agent_opinions(self):
         return [agent.opinions[0] for agent in self.agents]
 
+    def get_num_agents(self):
+        return len(self.agents)
+
     def get_mean_opinions(self):
         return np.mean(self.get_agent_opinions())
 
@@ -134,10 +137,18 @@ def gen_child_opinions(
         elif parent1.opinions[i] > parent2.opinions[i]:
             opinions.append(parent1.opinions[i] - opinion_delta * FRACTION_MOVE)
         else:
-            print("Opinions are the same! WOAH")
+            # print("Opinions are the same! WOAH")
             opinions.append(parent1.opinions[i])
     return np.array(opinions)
 
+def get_agent_by_uuid(uuid, teamA, teamB):
+    for agent in teamA.agents:
+        if agent.uuid == uuid:
+            return agent
+    for agent in teamB.agents:
+        if agent.uuid == uuid:
+            return agent
+    raise ValueError(f"Agent with UUID {uuid} not found in either team.")
 
 def sim(
     teamA: Team,
@@ -145,24 +156,36 @@ def sim(
     numIterations: int,
     FRACTION_MOVE: float = 0.25,
     TOLERANCE: float = 0.75,
+    within_team_percentage: float = 0.5,
 ) -> tuple[Team, Team]:
+    num_agents_start = len(teamA.agents) + len(teamB.agents)
     history = []
-    for i in range(0, numIterations):
+    for _ in range(0, numIterations):
+        if len(teamA.agents) == 0 or len(teamB.agents) == 0:
+            print("No Agents Left. Exiting.")
+            break
+        if len(teamA.agents) + len(teamB.agents) > 2*num_agents_start:
+            print("Too many agents in the simulation. Exiting.")
+            break
         # print(f"Starting with iteration {i}")
         # print(f"Num Agents Team A: {len(teamA.agents)}, Team B: {len(teamB.agents)}")
-
-        # print(teamA)
-        combinedAgents = teamA.agents + teamB.agents
-        random.shuffle(combinedAgents)
-        agentPairs = []
-        while (
-            len(combinedAgents) >= 2
-        ):  # if odd number the last agents just dies (maybe some other way to solve this)
-            agentPairs.append((combinedAgents.pop(), combinedAgents.pop()))
+        team_a_uuids = [agent.uuid for agent in teamA.agents]
+        team_b_uuids = [agent.uuid for agent in teamB.agents]
+        agentPairs = create_agent_pairs(team_a_uuids, team_b_uuids, within_team_percentage)
+        # combinedAgents = teamA.agents + teamB.agents
+        # random.shuffle(combinedAgents)
+        # agentPairs = []
+        # while (
+        #     len(combinedAgents) >= 2
+        # ):  # if odd number the last agents just dies (maybe some other way to solve this)
+        #     agentPairs.append((combinedAgents.pop(), combinedAgents.pop()))
         # teamACopy, teamBCopy, agentPairs = getAgentPairs(teamA, teamB)
 
         # check if agents can work together pair by pair - either same team auto yes, diff team check threshold, or both cases check threshold
-        for agent1, agent2 in agentPairs:
+        for agent1_uuid, agent2_uuid in agentPairs:
+            agent1 = get_agent_by_uuid(agent1_uuid, teamA, teamB)
+            agent2 = get_agent_by_uuid(agent2_uuid, teamA, teamB)
+
             delta = calculateDelta(agent1, agent2)
             # print(f"same team: {pair[0].team == pair[1].team}, delta: {delta}")
             if delta <= TOLERANCE:
@@ -227,6 +250,47 @@ def updateTeam(team: Team):
     return newTeam
 
 
+def create_agent_pairs(teamA_agents, teamB_agents, within_team_percentage):
+    """
+    Create agent pairs with a specified percentage of within-team matches.
+
+    Parameters:
+    - teamA_agents: List of agents from Team A.
+    - teamB_agents: List of agents from Team B.
+    - within_team_percentage: Percentage of matches that should be within the same team.
+
+    Returns:
+    - List of tuples, where each tuple represents a pair of agents.
+    """
+    # Calculate the number of agents to be paired within each team
+    min_number_of_agents = min(len(teamA_agents), len(teamB_agents))
+
+    #40 pairs AA, 40 pairs BB, 20 pairs AB
+
+    num_within_team_pairs_per_team = int(min_number_of_agents * within_team_percentage) // 2
+
+    # Separate the within-team pairing process
+    def create_within_team_pairs(agents, num_pairs_needed):
+        random.shuffle(agents)
+        return [(agents.pop(), agents.pop()) for i in range(num_pairs_needed)]
+
+    within_team_A = create_within_team_pairs(teamA_agents, num_within_team_pairs_per_team)
+    within_team_B = create_within_team_pairs(teamB_agents, num_within_team_pairs_per_team)
+
+    # Combine the remaining agents for between-team pairing
+    random.shuffle(teamA_agents)
+    random.shuffle(teamB_agents)
+    min_remaining_agents = min(len(teamA_agents), len(teamB_agents))
+
+    # Create pairs from the remaining agents for between-team matches
+    between_team_pairs = [(teamA_agents.pop(), teamB_agents.pop()) for _ in range(min_remaining_agents)]
+
+    # Combine within-team and between-team pairs
+    agent_pairs = within_team_A + within_team_B + between_team_pairs
+
+    return agent_pairs
+
+
 if __name__ == "__main__":
     # OTHER DIST OPTION
     # np.random.uniform
@@ -242,7 +306,7 @@ if __name__ == "__main__":
         mean=0.5, std_dev=0.25, lower_bound=0, upper_bound=1, dist_func=np.random.normal
     )
 
-    teamA, teamB = generateAgents(teamADist, teamBDist, agentsPerTeam=3)
+    teamA, teamB = generateAgents(teamADist, teamBDist, agentsPerTeam=10)
     FRACTION_MOVE = 0.25
     TOLERANCE = 0.75
-    history = sim(teamA, teamB, 2, FRACTION_MOVE, TOLERANCE)
+    history = sim(teamA, teamB, 10, FRACTION_MOVE, TOLERANCE)
