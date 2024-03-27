@@ -118,7 +118,7 @@ def calculateDelta(agentA, agentB) -> float:
 #                  [1.5, 1.0]]
 def getUtility(agent1: Agent, agent2: Agent):
     if agent1.team == agent2.team:
-        return 1.0  # UTILITY MATRIX[0][0] or UTILITY MATRIX[1][1]
+        return 1 # UTILITY MATRIX[0][0] or UTILITY MATRIX[1][1]
     else:
         return 1.5  # UTILITY MATRIX[0][1] or UTILITY MATRIX[1][0]
 
@@ -160,11 +160,13 @@ def sim(
 ) -> tuple[Team, Team]:
     num_agents_start = len(teamA.agents) + len(teamB.agents)
     history = []
-    for _ in range(0, numIterations):
+    for iteration in range(0, numIterations):
+        total_agents = len(teamA.agents) + len(teamB.agents)
+        print(f"Starting iteration {iteration}/{numIterations}, total agents: {total_agents}")
         if len(teamA.agents) == 0 or len(teamB.agents) == 0:
             print("No Agents Left. Exiting.")
             break
-        if len(teamA.agents) + len(teamB.agents) > 2*num_agents_start:
+        if total_agents > 5*num_agents_start:
             print("Too many agents in the simulation. Exiting.")
             break
         # print(f"Starting with iteration {i}")
@@ -182,7 +184,9 @@ def sim(
         # teamACopy, teamBCopy, agentPairs = getAgentPairs(teamA, teamB)
 
         # check if agents can work together pair by pair - either same team auto yes, diff team check threshold, or both cases check threshold
-        for agent1_uuid, agent2_uuid in agentPairs:
+        for pair_num, (agent1_uuid, agent2_uuid) in enumerate(agentPairs):
+            if pair_num > 1000:
+                break
             agent1 = get_agent_by_uuid(agent1_uuid, teamA, teamB)
             agent2 = get_agent_by_uuid(agent2_uuid, teamA, teamB)
 
@@ -310,3 +314,57 @@ if __name__ == "__main__":
     FRACTION_MOVE = 0.25
     TOLERANCE = 0.75
     history = sim(teamA, teamB, 10, FRACTION_MOVE, TOLERANCE)
+
+
+
+# Mean field equilibrium 
+# More than 50 
+# Whaat is the action: 
+# - Setting the threshold
+# Action --- High Tolerance or low tolerance
+ # They enter the room and they observe eachothers actions... 
+# They could learn these actions. 
+
+# We need a cost. For moving your opinion. 
+
+# What are the learnt strategies and the learnt outcomes. 
+
+# WE want a strategy that outputs action. It could depend only on my beliefs... to a threshold.
+# If you are extreme then your tolerance is less
+
+# The straategy could depend on the distribution of beliefs in the system. 
+# The strategy could depend on the history of the system. 
+
+# WE either set the dymanics... Set the strategy... then see the behaviour... --- This is fine but not very interesting. 
+# (this doesn't make sense unless we know that this is what people will do)
+# In the absesne of this it is an open question.. what should people do.. This is where we should study the equilibirum strategy. 
+
+
+# Can we introduce a coordinator? 
+
+# 1/ distance  and 1 - 1/distance
+
+
+## Another dimension of the game: 
+# I am the goverment-- I am rewarding them... What should I set the reward to incentivize them to cooperate. 
+
+
+
+# No regret learning... 
+# You take a set of actions. and then after a period of time you look back to see if I regret not setting my threshold to 0. You want your threshold to a value where you will not regret it later.
+
+# with no regret learning you will learn a CE
+
+
+# Best response dymanics. Ficitious play.  Looking at the time average of the action. 50% they do high threshold, 50% low.. 
+# 
+# Assume that is there. Observe past actions and asssume that is the strategy they are playing
+# Deep Q learning... take the reward then update the weights. 
+
+
+# right now we have a symmetric and constant strategy. of tolerance. 
+# We have to do a mechanism design ... fix them to a strategy.
+# If we are going to do something with a stragey. See if we can do The math... 
+
+# When you do mechanism design.. You look at the optimal strategy... 
+# All these agents are self interesed. Acting in their own way. 
