@@ -73,65 +73,129 @@ def get_reward(agent1: Agent, agent2: Agent):
     agent1Strategy = agent1.currentStrategy
     agent2Strategy = agent2.currentStrategy
 
+
+    ### A1 IS LOW COST
     if agent1Strategy == Tolerance.LOW and agent2Strategy == Tolerance.LOW:
         if distance <= THRESHOLDS[Tolerance.LOW]:
+            cost = 0.3*distance
+            reward = 1
             # low cost - easy to talk to the other person
             # high reward - despite being low tolerance you found someone to talk to
             pass
         
         else:
+            cost = 2*distance
+            reward = 0
             # cost = distance
             pass
 
     elif agent1Strategy == Tolerance.LOW and agent2Strategy == Tolerance.MEDIUM:
         if distance <= THRESHOLDS[Tolerance.LOW]:
+            cost = 0.3*distance
+            reward = 1.5
             # low cost -
             # high reward - despite being low tolerance you found someone to talk to
             pass
         
         else:
             # cost = distance*0.5
+            cost = 2*distance
+            reward = 0
             pass
 
     elif agent1Strategy == Tolerance.LOW and agent2Strategy == Tolerance.HIGH:
         if distance <= THRESHOLDS[Tolerance.LOW]:
+            cost = 0.3*distance
+            reward = 2
             # low cost -
             # high reward - despite being low tolerance you found someone to talk to
             pass
         
         else:
             # cost = distance*0.25
+            cost = 2*distance
+            reward = 0
             pass
 
-
+    ### A1 IS MEDIUM COST
     elif agent1Strategy == Tolerance.MEDIUM and agent2Strategy == Tolerance.LOW:
         if distance <= THRESHOLDS[Tolerance.MEDIUM]:
+            cost = 0.2*distance
+            reward = 0.5
             # low cost 
             # med reward - despite being low tolerance you found someone to talk to
             pass
         
         else:
+            cost = 1*distance
             # cost = distance
             pass
 
     elif agent1Strategy == Tolerance.MEDIUM and agent2Strategy == Tolerance.MEDIUM:
         if distance <= THRESHOLDS[Tolerance.MEDIUM]:
+            cost = 0.2*distance
+            reward = 1
             # low cost -
             # high reward - despite being low tolerance you found someone to talk to
             pass
         
         else:
             # cost = distance*0.5
+            cost = 1*distance
+            # cost = distance
             pass
 
     elif agent1Strategy == Tolerance.MEDIUM and agent2Strategy == Tolerance.HIGH:
         if distance <= THRESHOLDS[Tolerance.MEDIUM]:
+            cost = 0.2*distance
+            reward = 1.5
             # low cost -
             # high reward - despite being low tolerance you found someone to talk to
             pass
         
         else:
             # cost = distance*0.25
+            cost = 1*distance
+            pass
+
+    ### A1 IS HIGH COST
+    elif agent1Strategy == Tolerance.HIGH and agent2Strategy == Tolerance.LOW:
+        if distance <= THRESHOLDS[Tolerance.MEDIUM]:
+            cost = 0.1*distance
+            reward = 1
+            # low cost 
+            # med reward - despite being low tolerance you found someone to talk to
+            pass
+        
+        else:
+            cost = 0.5*distance
+            # cost = distance
+            pass
+
+    elif agent1Strategy == Tolerance.HIGH and agent2Strategy == Tolerance.MEDIUM:
+        if distance <= THRESHOLDS[Tolerance.MEDIUM]:
+            cost = 0.1*distance
+            reward = 1
+            # low cost -
+            # high reward - despite being low tolerance you found someone to talk to
+            pass
+        
+        else:
+            # cost = distance*0.5
+            cost = 0.5*distance
+            # cost = distance
+            pass
+
+    elif agent1Strategy == Tolerance.HIGH and agent2Strategy == Tolerance.HIGH:
+        if distance <= THRESHOLDS[Tolerance.MEDIUM]:
+            cost = 0.1*distance
+            reward = 1
+            # low cost -
+            # high reward - despite being low tolerance you found someone to talk to
+            pass
+        
+        else:
+            cost = 0.5*distance
             pass
 
     

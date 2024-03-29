@@ -317,6 +317,36 @@ if __name__ == "__main__":
 
 
 
+
+distance = Agent1.opinions - Agent2.opinions
+if Agent1.strat == LOW and Agent2.strat == LOW:
+    if withinThreshold:
+        No Cost -- Easy to talk 
+        minimal reward
+    outsideThreshold:
+        high cost -- Because your blood pressure goes up from being annoyed
+        or low cost becuase you just don't talk to them.
+    
+if Agent1.strat == LOW and Agent2.strat == MED:
+    if within Threshold:
+        Low Cost 
+    
+    
+if Agent1.strat == LOW and Agent2.strat == HIGH:
+    
+if Agent1.strat == MED and Agent2.strat == LOW:
+
+if Agent1.strat == MED and Agent2.strat == MED:
+    
+if Agent1.strat == MED and Agent2.strat == HIGH:
+    
+if Agent1.strat == HIGH and Agent2.strat == LOW:
+    
+if Agent1.strat == HIGH and Agent2.strat == MED:
+    
+if Agent1.strat == HIGH and Agent2.strat == HIGH:
+    
+
 # Mean field equilibrium 
 # More than 50 
 # Whaat is the action: 
