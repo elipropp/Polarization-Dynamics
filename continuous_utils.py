@@ -14,7 +14,7 @@ class Tolerance(Enum):
     HIGH = 3
 
 TOLERANCES = [1, 2, 3]
-EPSILON = 0.1
+EPSILON = 0.1 # learning rate
 
 
 # THRESHOLDS = {Tolerance.LOW: 0.4, Tolerance.MEDIUM: 0.8, Tolerance.HIGH: 1.2}
@@ -27,13 +27,6 @@ class Distribution:
     lower_bound: float
     upper_bound: float
     dist_func: np.random
-
-
-# @dataclass
-# class Interaction:
-#     other_opinions: list[float]
-#     other_strategy: Tolerance
-
 
 class Agent:
     def __init__(
