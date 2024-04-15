@@ -28,6 +28,10 @@ class Distribution:
     upper_bound: float
     dist_func: np.random
 
+def convert_weights_to_probabilities(low_w, med_w, high_w):
+    total_weight = sum([low_w, med_w, high_w])
+    return (low_w / total_weight, med_w / total_weight, high_w / total_weight)
+
 class Agent:
     def __init__(
         self, uuid: UUID, team: int, opinions: list[float]
@@ -42,14 +46,18 @@ class Agent:
         # self.rewardSinceLastUpdate = 0
         # self.connected_agents = []
         self.strategy_weights = np.ones(3)
-        self.old_strategy_weights = []
+        self.old_strategy_weights = [np.ones(3)]
         self.strategy_loss = {1: 0, 2: 0, 3: 0}
         self.agent_loss = 0
+        self.agent_strat_prob_history = []
         # self.stratToReward = {
         #     Tolerance.LOW: 0,
         #     Tolerance.MEDIUM: 0,
         #     Tolerance.HIGH: 0,
         # }
+    def update_agent_strat_prob_history(self) -> list[tuple[float, float, float]]:
+        self.agent_strat_prob_history = [convert_weights_to_probabilities(*weights) for weights in self.old_strategy_weights]
+
 
     # def add_interaction(self, other_opinions: list[float], other_strategy: Tolerance):
     #     self.interactionHistory.append(Interaction(other_opinions, other_strategy))
@@ -181,9 +189,6 @@ def sim(
             other_agent = agents[other_agent_uuid]
 
             # agent.add_interaction(other_agent.opinions, other_agent.currentStrategy)
-
-            agent.old_strategy_weights.append(agent.strategy_weights)
-
             # choose strat based on weights
             agent_strategy = get_strategy(agent)
             other_agent_strategy = get_strategy(other_agent)
@@ -214,8 +219,10 @@ def sim(
                 # - 1 bc it's an np.array
                 agent.strategy_weights[strategy - 1] *= math.exp(-EPSILON*loss)
 
+            agent.old_strategy_weights.append(agent.strategy_weights.copy())
+
         if iteration % 100 == 0:
-            print(f"iteration: {iteration}")
+            print(f"iteration: {iteration}. 100 iterations completed in: {time.time() - start_time} seconds")
 
     #     if iteration % 500 == 0:
     #         num_strats_stable = sum([agent.is_strategy_stable() for agent in agents.values()])
