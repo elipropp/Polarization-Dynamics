@@ -7,7 +7,7 @@ from enum import Enum
 from uuid import UUID, uuid4
 
 import numpy as np
-
+import pickle
 
 class Tolerance(Enum):
     LOW = 1
@@ -27,6 +27,10 @@ class Distribution:
     dist_func: np.random
 
 
+def convert_weights_to_probabilities(low_w, med_w, high_w):
+    total_weight = sum([low_w, med_w, high_w])
+    return (low_w / total_weight, med_w / total_weight, high_w / total_weight)
+
 class Agent:
     def __init__(
         self, uuid: UUID, team: int, opinions: list[float], strategy_weights: np.array
@@ -39,6 +43,10 @@ class Agent:
         self.old_strategy_weights = []
         self.strategy_loss = {1: 0, 2: 0, 3: 0}
         self.agent_loss = 0
+        self.agent_loss_history = []
+        
+    def update_agent_strat_prob_history(self) -> list[tuple[float, float, float]]:
+        self.agent_strat_prob_history = [convert_weights_to_probabilities(*weights) for weights in self.old_strategy_weights]
 
 
 # Agent generation with type hints
@@ -121,6 +129,7 @@ def sim(agents: dict[UUID, Agent], numIterations: int, epsilon: float) -> dict[A
                 agent.strategy_loss[strategy] += loss
                 if strategy == agent_strategy:
                     agent.agent_loss += loss
+                    agent.agent_loss_history.append(loss)
                 # - 1 bc it's an np.array
                 agent.strategy_weights[strategy - 1] *= (
                     math.exp(-epsilon * loss) * weight_multiplier
@@ -136,18 +145,25 @@ def sim(agents: dict[UUID, Agent], numIterations: int, epsilon: float) -> dict[A
 
     return agents
 
+def save_agents(agents, filename):
+    filename = "../saved_sim_runs/" + filename + ".pkl"
+    with open(filename, "wb") as file:
+        pickle.dump(agents, file)
 
 def run_sim(args):
-    percent_low, agents = args
-    print(f"Simulating low preference percent {percent_low}")
-    num_iterations = 1000
+    percent_low, percent_med, percent_high, agents = args
+    print(f"Simulating low percent: {percent_low}, med percent: {percent_med} high percent: {percent_high}")
+    num_iterations = 10000
     learning_rate = 0.1
-    return percent_low, sim(agents, num_iterations, learning_rate)
+    new_agents = sim(agents, num_iterations, learning_rate)
+    
+    save_agents(new_agents, f"low_{percent_low}_med_{percent_med}_high_{percent_high}_{num_iterations}_iterations_{time.time_ns()}")
+    return None
 
 def start_multiprocess_sim(all_agents: list[tuple[str, list[Agent]]]) -> list[tuple[str, list[Agent]]]:
     pool = multiprocessing.Pool(processes=multiprocessing.cpu_count() - 1)
-    all_agents_post_sim: list[tuple[str, list[Agent]]] = pool.map(run_sim, all_agents)
+    result = pool.map(run_sim, all_agents)
 
     pool.close()
     pool.join()
-    return all_agents_post_sim
+    return result
