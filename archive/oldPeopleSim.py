@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 import time
 import numpy as np
 
-from generateOpinions import bimodal_opinions
+from sim_notebooks.generateOpinions import bimodal_opinions
 
 class Tolerance(Enum):
     LOW = 0
