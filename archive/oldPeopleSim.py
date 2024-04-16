@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 import time
 import numpy as np
 
-from sim_notebooks.generateOpinions import bimodal_opinions
+from sim_notebooks.generate_opinions import bimodal_opinions
 
 class Tolerance(Enum):
     LOW = 0
@@ -86,7 +86,7 @@ class Agent:
 def generate_agents(opinions, total_connections_per_agent: int, percent_same_team: float) -> dict[str, Agent]:
     agents: dict[str, Agent] = {}
     print(len(opinions))
-    for i, opinion in enumerate(opinions):
+    for _, opinion in enumerate(opinions):
         team = 0 if opinion < 0 else 1 # team based on opinion
         # team = i % 2 # mixed opinions on each team
         # trunk-ignore(bandit/B311)
