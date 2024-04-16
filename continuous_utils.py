@@ -221,7 +221,7 @@ def sim(
 
             agent.old_strategy_weights.append(agent.strategy_weights.copy())
 
-        if iteration % 100 == 0:
+        if iteration > 0 and iteration % 100 == 0:
             print(f"iteration: {iteration}. 100 iterations completed in: {time.time() - start_time} seconds")
 
     #     if iteration % 500 == 0:
