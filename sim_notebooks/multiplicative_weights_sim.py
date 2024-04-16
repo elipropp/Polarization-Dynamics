@@ -1,4 +1,5 @@
 import math
+import multiprocessing
 import random
 import time
 from dataclasses import dataclass
@@ -75,7 +76,7 @@ def sim(agents: dict[UUID, Agent], numIterations: int, epsilon: float) -> dict[A
     sim_start = time.time()
     iter_start_time = time.time()
     for iteration in range(numIterations):
-        
+
         for uuid, agent in agents.items():
             other_agents = [key for key in agents.keys() if key != uuid]
             # trunk-ignore(bandit/B311)
@@ -126,9 +127,27 @@ def sim(agents: dict[UUID, Agent], numIterations: int, epsilon: float) -> dict[A
                 )
 
         if iteration % 100 == 0 and iteration > 0:
-            print(f"iterations: {iteration - 100} - {iteration} took {time.time() - iter_start_time} seconds")
+            print(
+                f"iterations: {iteration - 100} - {iteration} took {time.time() - iter_start_time} seconds"
+            )
             iter_start_time = time.time()
-    
+
     print(f"total sim time: {time.time() - sim_start}")
 
     return agents
+
+
+def run_sim(args):
+    percent_low, agents = args
+    print(f"Simulating low preference percent {percent_low}")
+    num_iterations = 1000
+    learning_rate = 0.1
+    return percent_low, sim(agents, num_iterations, learning_rate)
+
+def start_multiprocess_sim(all_agents: list[tuple[str, list[Agent]]]) -> list[tuple[str, list[Agent]]]:
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count() - 1)
+    all_agents_post_sim: list[tuple[str, list[Agent]]] = pool.map(run_sim, all_agents)
+
+    pool.close()
+    pool.join()
+    return all_agents_post_sim
